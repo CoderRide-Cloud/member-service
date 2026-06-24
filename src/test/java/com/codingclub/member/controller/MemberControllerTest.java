@@ -1,5 +1,6 @@
 package com.codingclub.member.controller;
 
+import com.codingclub.member.dto.MemberResponse;
 import com.codingclub.member.model.Member;
 import com.codingclub.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,9 +40,9 @@ public class MemberControllerTest {
 
     @Test
     void testGetMemberByUserId() {
-        when(memberService.getMemberByUserId(100L)).thenReturn(testMember);
+        when(memberService.getMemberResponseByUserId(100L)).thenReturn(MemberResponse.from(testMember, List.of(), null));
 
-        ResponseEntity<Member> response = memberController.getMemberByUserId(100L);
+        ResponseEntity<MemberResponse> response = memberController.getMemberByUserId(100L);
 
         assertNotNull(response.getBody());
         assertEquals("John Doe", response.getBody().getFullName());
@@ -55,9 +58,11 @@ public class MemberControllerTest {
         savedMember.setUserId(100L);
         savedMember.setFullName("John Smith");
 
-        when(memberService.updateMember(eq(100L), any(Member.class))).thenReturn(savedMember);
+        when(memberService.updateMember(eq(100L), any(Member.class))).thenReturn(
+                MemberResponse.from(savedMember, List.of(), null));
 
-        ResponseEntity<Member> response = memberController.updateMyProfile("100", updatedData);
+        ResponseEntity<MemberResponse> response = memberController.updateMyProfile(
+                "100", "MEMBER", "", "0", "false", "true", "", updatedData);
 
         assertNotNull(response.getBody());
         assertEquals("John Smith", response.getBody().getFullName());
